@@ -1,3 +1,5 @@
+import { SubscribeButton } from '../SubscribeButton';
+
 import styles from './styles.module.scss';
 
 export function HomeBanner() {
@@ -10,6 +12,7 @@ export function HomeBanner() {
           Get access to all publications<br/>
           <span>for $9.9/month</span>
         </p>
+        <SubscribeButton />
       </section>
 
       <img src="/images/avatar.svg" alt="" />

@@ -38,6 +38,10 @@
       font-weight: bold;
     }
   }
+
+  button {
+    margin-top: 2rem;
+  }
 }
 
 @media (max-width: 720px) {
@@ -53,7 +57,6 @@
 
     img {
       position: relative;
-      bottom: 2rem;
       max-width: 350px;
       z-index: 0;
       filter: brightness(0.8);
