@@ -15,18 +15,26 @@ export default NextAuth({
     }),
     // add more authentication providers as necessary
   ],
+  jwt: {
+    secret: process.env.SIGNIN_KEY,
+  },
   callbacks: {
     async signIn({ user }) {
       const { email } = user;
 
-      await fauna.query(
-        q.Create(
-          q.Collection('users'),
-          { data: { email } }
-        )
-      );
+      try {
+        await fauna.query(
+          q.Create(
+            q.Collection('users'),
+            { data: { email } }
+          )
+        );
 
-      return true;
+        return true;
+      } catch (error) {
+        const { description } = error;
+        return description.includes('is not unique');
+      };
     },
   }
 });
