@@ -9,8 +9,8 @@ export default function Home() {
         <title>Início | ig.news</title>
       </Head>
 
-      <main>
-        <section>
+      <main className={styles.contentContainer}>
+        <section className={styles.hero}>
           <span>👏 Hey, welcome</span>
           <h1>News about the <span>React</span> world</h1>
           <p>
@@ -18,6 +18,8 @@ export default function Home() {
             <span>for $9.9/month</span>
           </p>
         </section>
+
+        <img src="/images/avatar.svg" alt="" />
       </main>
     </>
   )
