@@ -6,7 +6,15 @@ export default NextAuth({
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      authorization: {
+        params: { scope: 'read:user' },
+      },
     }),
     // add more authentication providers as necessary
   ],
+  callbacks: {
+    session({ session }) {
+      return session;
+    },
+  }
 });
