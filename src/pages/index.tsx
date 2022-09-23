@@ -2,26 +2,43 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 
 import { HomeBanner } from '../components/HomeBanner';
+import { stripe } from '../services/stripe';
 
 import styles from '../styles/home.module.scss';
 
-export default function Home(props) {
+interface HomeProps {
+  product: {
+    priceId: string;
+    amount: number;
+  }
+};
+
+export default function Home({ product }: HomeProps) {
   return (
     <>
       <Head>
         <title>Início | ig.news</title>
       </Head>
 
-      <HomeBanner />
+      <HomeBanner productPrice={product.amount} />
     </>
   )
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
   // runs in a server side node env
+  const price = await stripe.prices.retrieve('price_1Ll3UgC2rcl2xbfnWmNaR0PR', {
+    expand: ['product'],
+  });
+
+  const product = {
+    priceId: price.id,
+    amount: price.unit_amount / 100,
+  }
+
   return {
     props: {
-      price: '9.9',
+      product
     }
   }
 }

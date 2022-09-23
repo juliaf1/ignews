@@ -2,7 +2,11 @@ import { SubscribeButton } from '../SubscribeButton';
 
 import styles from './styles.module.scss';
 
-export function HomeBanner() {
+interface Props {
+  productPrice: number;
+}
+
+export function HomeBanner({ productPrice }: Props) {
   return(
     <main className={styles.contentContainer}>
       <section className={styles.hero}>
@@ -10,7 +14,7 @@ export function HomeBanner() {
         <h1>News about the <span>React</span> world</h1>
         <p>
           Get access to all publications<br/>
-          <span>for $9.9/month</span>
+          <span>for ${productPrice}/month</span>
         </p>
         <SubscribeButton />
       </section>
