@@ -6,7 +6,7 @@ import { stripe } from '../services/stripe';
 
 import styles from '../styles/home.module.scss';
 
-interface HomeProps {
+export interface HomeProps {
   product: {
     priceId: string;
     amount: number;
@@ -20,7 +20,7 @@ export default function Home({ product }: HomeProps) {
         <title>Início | ig.news</title>
       </Head>
 
-      <HomeBanner productPrice={product.amount} />
+      <HomeBanner product={product} />
     </>
   )
 };
