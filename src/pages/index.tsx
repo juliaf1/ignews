@@ -28,7 +28,7 @@ export default function Home({ product }: HomeProps) {
 export const getStaticProps: GetStaticProps = async () => {
   // getServerSideProps: runs in a server side node env
   // getStaticProps: implements static side generation by saving the html
-  const price = await stripe.prices.retrieve('price_1Ll3UgC2rcl2xbfnWmNaR0PR', {
+  const price = await stripe.prices.retrieve(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID, {
     expand: ['product'],
   });
 
