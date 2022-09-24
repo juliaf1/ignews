@@ -8,17 +8,16 @@ import { stripe } from '../../services/stripe';
 interface User {
   ref: {
     id: string;
-  }
+  },
+  data: {
+    stripe_customer_id: string;
+  },
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     const session = await getSession({ req });
     const { email } = session.user;
-
-    const customer = await stripe.customers.create({
-      email
-    });
 
     const user = await fauna.query<User>(
       q.Get(
@@ -27,21 +26,31 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           q.Casefold(email)
         )
       )
-    )
+    );
 
-    await fauna.query(
-      q.Update(
-        q.Ref(q.Collection('users'), user.ref.id),
-        {
-          data: {
-            stripe_customer_id: customer.id
+    let customerId = user.data.stripe_customer_id;
+
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email
+      });
+
+      customerId = customer.id;
+  
+      await fauna.query(
+        q.Update(
+          q.Ref(q.Collection('users'), user.ref.id),
+          {
+            data: {
+              stripe_customer_id: customerId
+            }
           }
-        }
-      )
-    )
+        )
+      );
+    };
 
     const checkoutSession = await stripe.checkout.sessions.create({
-      customer: customer.id,
+      customer: customerId,
       payment_method_types: ['card'],
       billing_address_collection: 'required',
       line_items: [
