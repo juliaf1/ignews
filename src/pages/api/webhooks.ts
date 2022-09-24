@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { Readable } from 'stream';
 
 import { stripe } from '../../services/stripe';
-import { saveSubscription } from './_lib/manageSubscription';
+import { saveSubscription, updateSubscription } from './_lib/manageSubscription';
 
 async function buffer(readable: Readable) {
   const chunks = [];
@@ -23,9 +23,13 @@ export const config = {
   },
 };
 
-const events = new Set([
-  'checkout.session.completed'
-]);
+const EVENTS = {
+  subscriptions: {
+    created: 'customer.subscription.created',
+    updated: 'customer.subscription.updated',
+    deleted: 'customer.subscription.deleted',
+  }
+};
 
 export default async function webhooks(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -46,20 +50,27 @@ export default async function webhooks(req: NextApiRequest, res: NextApiResponse
 
   const { type } = event;
 
-  if (events.has(type)) {
-    switch(type) {
-      case 'checkout.session.completed':
-        const checkoutSession = event.data.object as Stripe.Checkout.Session;
-       
-        await saveSubscription(
-          checkoutSession.subscription.toString(),
-          checkoutSession.customer.toString()
-        );
+  switch(type) {
+    case EVENTS.subscriptions.created:
+    case EVENTS.subscriptions.updated:
+    case EVENTS.subscriptions.deleted:
+      const subscription = event.data.object as Stripe.Subscription;
 
-        break;
-      default:
-        break;
-    };
+      if (type === EVENTS.subscriptions.created) {
+        await saveSubscription(
+          subscription.id,
+          subscription.customer.toString()
+        );
+      } else {
+        await updateSubscription(
+          subscription.id,
+          subscription.customer.toString()
+        );
+      };
+
+      break;
+    default:
+      break;
   };
 
   res.status(200).send({});
