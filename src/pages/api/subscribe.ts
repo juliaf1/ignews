@@ -14,7 +14,7 @@ interface User {
   },
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function subscribe(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const session = await getSession({ req });
     const { email } = session.user;
