@@ -38,6 +38,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, params }) =>
   const session = await getSession({ req });
   const { id } = params;
 
+  if (!session.activeSubscription) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      }
+    };
+  };
+
   // Request API/DB for post with that slug/id
 
   return {
