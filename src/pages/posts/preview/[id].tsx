@@ -1,5 +1,7 @@
-import { GetStaticProps } from 'next';
-import { getSession } from 'next-auth/react';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 
@@ -15,6 +17,15 @@ interface PostPreviewProps {
 };
 
 export default function PostPreview({ post }: PostPreviewProps) {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (session?.activeSubscription) {
+      router.push(`/posts/${post.id}`);
+    }
+  }, [session]);
+  
   return(
     <>
       <Head>
@@ -42,10 +53,18 @@ export default function PostPreview({ post }: PostPreviewProps) {
   )
 };
 
-export const getStaticPaths = () => {
+export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths: [],
-    fallback: 'blocking',
+    paths: [
+      {
+        params: {
+          id: '1'
+        }
+      }
+    ],
+    fallback: 'blocking', // load post on server side before loading page
+    // fallback: true // load page before loading post
+    // fallback: false // render 404 if static page is not yet generated
   };
 };
 
@@ -62,6 +81,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         content: '<p>In this guide, you will learn how to create a <a href="/">Next</a> application with TypeScript from scratch... Next.js is an open-source web development framework created by Vercel enabling React-based web applications with server-side rendering and generating static websites.</p>',
         created_at: 'Sunday, October 02, 2022',
       }
-    }
+    },
+    redirect: 60 * 30, // 30 minutes
   }
 };
